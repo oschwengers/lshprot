@@ -3,6 +3,7 @@ import logging
 import pickle
 import sqlite3
 import sys
+import os
 
 from pathlib import Path
 
@@ -21,6 +22,8 @@ def main(args):
     # parameter checks
     db_path = Path(args.db).resolve()
     log.info('parameter: db=%s', db_path)
+    tmp_path = Path(args.tmp_dir).resolve()
+    log.info('parameter: tmp-dir=%s', tmp_path)
     # ToDo check db path
     if args.shingle < 2:
         print(f"Error: shingle size must be >= 2!")
@@ -31,6 +34,7 @@ def main(args):
         sys.exit(-1)
     log.info('parameter: permutations=%i', args.permutations)
 
+    os.environ['SQLITE_TMPDIR'] = str(tmp_path)  # set SQLITE tmp dir env var
 
     # init and fill LSH
     with sqlite3.connect(str(db_path), isolation_level='EXCLUSIVE') as conn, xopen(str(args.input), threads=0) as fh:
